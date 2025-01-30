@@ -2,11 +2,11 @@ import { View, Text, StyleSheet } from "react-native";
 import Selltopbar from "./sell/Selltopbar";
 import Sellmain from "./sell/Sellmain";
 
-const Sellpage = ({ userId, setUserId }) => {
+const Sellpage = ({ userId, setUserId ,url}) => {
   return (
     <View style={styles.container}>
-      <Selltopbar />
-      <Sellmain userId={userId} setUserId={setUserId} />
+      <Selltopbar url={url}/>
+      <Sellmain userId={userId} setUserId={setUserId} url={url}/>
     </View>
   );
 };

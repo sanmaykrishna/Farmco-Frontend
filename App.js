@@ -7,13 +7,13 @@ import axios from "axios";
 import Cropyield from "./Cropyield";
 import Login from "./authorize/Login";
 import Register from "./authorize/Register";
-
 const App = () => {
-  const [navigation, setNavigation] = useState(1);
+  const [navigation, setNavigation] = useState(3);
   const [city, setCity] = useState("None");
   const [data, setData] = useState({});
   const [userId, setUserId] = useState(null);
 
+  const url="192.168.0.190";
   const containerStyle = navigation === 1 || navigation === 2 ? styles.container1 : styles.container2;
   return (
     <View style={containerStyle}>
@@ -23,6 +23,7 @@ const App = () => {
           setNavigation={setNavigation}
           data={data}
           setData={setData}
+          url={url}
         />
       ) : navigation === 2 ? (
         <Login
@@ -32,15 +33,16 @@ const App = () => {
           setData={setData}
           userId={userId}
           setUserId={setUserId}
+          url={url}
         />
       ) : navigation === 3 ? (
-        <Buypage city={city} setCity={setCity} />
+        <Buypage city={city} setCity={setCity} url={url}/>
       ) : navigation == 4 ? (
-        <Sellpage userId={userId} setUserId={setUserId} />
+        <Sellpage userId={userId} setUserId={setUserId} url={url}/>
       ) : navigation == 5 ? (
-        <Cropyield />
+        <Cropyield url={url}/>
       ) : null}
-      <Navbar navigation={navigation} setNavigation={setNavigation} />
+      <Navbar navigation={navigation} setNavigation={setNavigation} url={url} />
     </View>
   );
 };

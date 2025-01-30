@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Pressable } from "react-native";
 import Feather from "@expo/vector-icons/Feather";
 import Sellitem from "./Sellitem";
 
-const Sellmain = ({userId,setUserId}) => {
+const Sellmain = ({userId,setUserId,url}) => {
   const [selected, setSelected] = useState(null);
   const [showSellItem, setShowSellItem] = useState(false); // To toggle Sellitem view
 
@@ -14,7 +14,7 @@ const Sellmain = ({userId,setUserId}) => {
   ];
 
   if (showSellItem) {
-    return <Sellitem userId={userId} setUserId={setUserId}/>;
+    return <Sellitem userId={userId} setUserId={setUserId} url={url}/>;
   }
 
   return (

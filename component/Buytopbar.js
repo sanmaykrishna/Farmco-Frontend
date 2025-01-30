@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TextInput, Pressable } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useState } from "react";
 import Feather from "@expo/vector-icons/Feather";
-const Buytopbar = ({ search, setSearch, locpage, setLocpage,city,setCity }) => {
+const Buytopbar = ({ search, setSearch, locpage, setLocpage,city,setCity,url }) => {
   
 
   const handleLoc=()=>{

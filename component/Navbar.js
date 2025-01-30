@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
-const Navbar = ({ navigation, setNavigation }) => {
+const Navbar = ({ navigation, setNavigation,url }) => {
   return (
     <View style={styles.container}>
       <TouchableOpacity

@@ -19,13 +19,13 @@ const imageMap = {
   // Add more mappings as needed
 };
 
-const Buymain = ({ search, city, setCity }) => {
+const Buymain = ({ search, city, setCity,url }) => {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
     const getItem = async () => {
       try {
-        const { data } = await axios.get(`http://192.168.133.188:3000/product/location?location_name=${encodeURIComponent(city)}`);
+        const { data } = await axios.get(`http://${url}:3000/product/location?location_name=${encodeURIComponent(city)}`);
         setProducts(data); // Assuming the API returns an array of products
       } catch (error) {
         console.error("Error fetching products:", error);

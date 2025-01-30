@@ -5,7 +5,7 @@ import { useState } from "react";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
 import Feather from '@expo/vector-icons/Feather';
 
-const Selltopbar = () => {
+const Selltopbar = ({url}) => {
   return (
     <View style={styles.container}>
       {/* Top Section */}

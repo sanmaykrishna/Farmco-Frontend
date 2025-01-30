@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import Feather from "@expo/vector-icons/Feather";
-const Searchlocation = ({ locpage, setLocpage, city, setCity }) => {
+const Searchlocation = ({ locpage, setLocpage, city, setCity,url }) => {
   const [locopen, setLocopen] = useState(true);
   const [locvalue, setLocvalue] = useState(null);
   const [locitems, setLocitems] = useState([]);
@@ -12,7 +12,7 @@ const Searchlocation = ({ locpage, setLocpage, city, setCity }) => {
   useEffect(() => {
     const getLocation = async () => {
       try { 
-        const { data } = await axios.get("http://192.168.133.188:3000/locations");
+        const { data } = await axios.get(`http://${url}:3000/locations`);
         const formattedLocations = data.map((location) => ({
           label: location.location_name,
           value: location.location_name, // Changed to location_name to match API requirements

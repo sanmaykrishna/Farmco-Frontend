@@ -12,7 +12,7 @@ import {
   import axios from "axios";
   import Feather from "@expo/vector-icons/Feather";
   
-  const Sellitem = ({userId,setUserId}) => {
+  const Sellitem = ({userId,setUserId,url}) => {
     const [items, setItems] = useState([]);
     const [open, setOpen] = useState(false);
     const [value, setValue] = useState(null);
@@ -30,7 +30,7 @@ import {
     useEffect(() => {
       const getItem = async () => {
         try {
-          const { data } = await axios.get("http://192.168.133.188:3000/items");
+          const { data } = await axios.get(`http://${url}:3000/items`);
           const formattedItems = data.map((item) => ({
             label: item.item_name,
             value: item.item_name, // Changed to item_name to match API requirements
@@ -43,7 +43,7 @@ import {
   
       const getLocation = async () => {
         try {
-          const { data } = await axios.get("http://192.168.133.188:3000/locations");
+          const { data } = await axios.get(`http://${url}:3000/locations`);
           const formattedLocations = data.map((location) => ({
             label: location.location_name,
             value: location.location_name, // Changed to location_name to match API requirements
@@ -75,7 +75,7 @@ import {
   
       try {
         const response = await axios.post(
-          "http://192.168.133.188:3000/product",
+          `http://${url}:3000/product`,
           sellitemdata,
           config
         );

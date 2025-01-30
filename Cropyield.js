@@ -14,9 +14,10 @@ import {
 import axios from "axios";
 import { Picker } from "@react-native-picker/picker";
 
-const API_URL = "http://192.168.133.188:5000"; // For Android Emulator, use 10.0.2.2 as localhost
 
-const Cropyield = () => {
+
+const Cropyield = ({url}) => {
+  const API_URL = `http://${url}:5000`; // For Android Emulator, use 10.0.2.2 as localhost
   const [crops, setCrops] = useState({}); // Crop mappings
   const [soilTypes, setSoilTypes] = useState({}); // Soil types
   const [climates, setClimates] = useState({}); // Climate types

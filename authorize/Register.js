@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import axios from "axios";
 
-export default function Register({ setNavigation, data, setData }) {
+export default function Register({ setNavigation, data, setData,url }) {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -53,7 +53,7 @@ export default function Register({ setNavigation, data, setData }) {
 
     try {
       await axios.post(
-        "http://192.168.133.188:3000/users/newuser",
+        `http://${url}:3000/users/newuser`,
         newUser,
         config
       );

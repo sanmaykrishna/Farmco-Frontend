@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, TextInput, StyleSheet, Pressable, Alert } from "react-native";
 import axios from "axios";
 
-export default function Login({ navigation, setNavigation, data,userId,setUserId }) {
+export default function Login({ navigation, setNavigation, data,userId,setUserId,url }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   
@@ -24,7 +24,7 @@ export default function Login({ navigation, setNavigation, data,userId,setUserId
     };
 
     try {
-      const response = await axios.post("http://192.168.133.188:3000/users/login", loginUser, config);
+      const response = await axios.post(`http://${url}:3000/users/login`, loginUser, config);
       
       Alert.alert("Success", "Login Successful");
       
