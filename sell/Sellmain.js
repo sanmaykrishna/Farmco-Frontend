@@ -2,52 +2,61 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import Feather from "@expo/vector-icons/Feather";
 import Sellitem from "./Sellitem";
+import Postcollab from "./Postcollab";
+import Viewcollab from "./Viewcollab";
 
-const Sellmain = ({userId,setUserId,url}) => {
+const Sellmain = ({userId,setUserId,url,navigation,setNavigation}) => {
   const [selected, setSelected] = useState(null);
-  const [showSellItem, setShowSellItem] = useState(false); // To toggle Sellitem view
-
+  const [showSellItem, setShowSellItem] = useState(0);
+ 
   const options = [
-    { id: 1, label: "Sell An Item", icon: "shopping-bag" },
+    { id: 1, label: "Sell An Item", icon: "shopping-bag"},
     { id: 2, label: "Post Collab", icon: "upload" },
     { id: 3, label: "View Collabs", icon: "archive" },
   ];
 
-  if (showSellItem) {
-    return <Sellitem userId={userId} setUserId={setUserId} url={url}/>;
-  }
-
+  const handleOptionPress = (optionId) => {
+    setSelected(optionId);
+    if (optionId === 1) {
+      setShowSellItem(1); // Show Sellitem page for "Sell An Item"
+    } else if (optionId === 2) {
+      setShowSellItem(2); // Navigate to Postcollab
+    } else if (optionId === 3) {
+      setShowSellItem(3); // Navigate to Viewcollab
+    }
+  };
+  
+ 
   return (
     <View style={styles.container}>
-      {options.map((option) => (
-        <Pressable
-          key={option.id}
-          onPressIn={() => {
-            setSelected(option.id);
-            if (option.id === 1) {
-              setShowSellItem(true); // Show Sellitem page for "Sell An Item"
-            }
-          }}
-          style={[
-            styles.box,
-            selected === option.id && styles.selectedBox,
-          ]}
-        >
-          <Feather
-            name={option.icon}
-            size={24}
-            color={selected === option.id ? "white" : "black"}
-          />
-          <Text
+      {showSellItem === 1 ? (
+        <Sellitem userId={userId} setUserId={setUserId} url={url} />
+      ) : showSellItem ===2 ? <Postcollab userId={userId} setUserId={setUserId} url={url}/> : showSellItem === 3 ? <Viewcollab/> : (
+        options.map((option) => (
+          <Pressable
+            key={option.id}
+            onPressIn={() => handleOptionPress(option.id)}
             style={[
-              styles.label,
-              selected === option.id && styles.selectedLabel,
+              styles.box,
+              selected === option.id && styles.selectedBox,
             ]}
           >
-            {option.label}
-          </Text>
-        </Pressable>
-      ))}
+            <Feather
+              name={option.icon}
+              size={24}
+              color={selected === option.id ? "white" : "black"}
+            />
+            <Text
+              style={[
+                styles.label,
+                selected === option.id && styles.selectedLabel,
+              ]}
+            >
+              {option.label}
+            </Text>
+          </Pressable>
+        ))
+      )}
     </View>
   );
 };

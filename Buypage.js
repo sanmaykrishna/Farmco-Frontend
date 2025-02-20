@@ -5,19 +5,40 @@ import Navbar from "./component/Navbar";
 import { useState } from "react";
 import Searchlocation from "./component/Searchlocation";
 
-const Buypage = ({city,setCity,url}) => {
+const Buypage = ({ city, setCity, url, setNavigation, setCartItems }) => {
   const [search, setSearch] = useState("");
   const [locpage, setLocpage] = useState(1);
-  
+
   return (
     <View style={styles.container}>
       {locpage === 1 ? (
         <>
-          <Buytopbar search={search} setSearch={setSearch} locpage={locpage} setLocpage={setLocpage} city={city} setCity={setCity} url={url}/>
-          <Buymain search={search} city={city} setCity={setCity} url={url}/>
+          <Buytopbar
+            search={search}
+            setSearch={setSearch}
+            locpage={locpage}
+            setLocpage={setLocpage}
+            city={city}
+            setCity={setCity}
+            url={url}
+            setNavigation={setNavigation}
+          />
+          <Buymain
+            search={search}
+            city={city}
+            setCity={setCity}
+            url={url}
+            setCartItems={setCartItems}
+          />
         </>
       ) : (
-        <Searchlocation locpage={locpage} setLocpage={setLocpage} city={city} setCity={setCity} url={url}/>
+        <Searchlocation
+          locpage={locpage}
+          setLocpage={setLocpage}
+          city={city}
+          setCity={setCity}
+          url={url}
+        />
       )}
     </View>
   );

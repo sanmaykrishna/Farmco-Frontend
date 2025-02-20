@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Image, ScrollView } from "react-native";
+import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import axios from "axios";
 
@@ -19,7 +19,7 @@ const imageMap = {
   // Add more mappings as needed
 };
 
-const Buymain = ({ search, city, setCity,url }) => {
+const Buymain = ({ search, city, setCity,url,setCartItems }) => {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
@@ -40,7 +40,27 @@ const Buymain = ({ search, city, setCity,url }) => {
   // Filter products based on search query (case-insensitive)
   const filteredProducts = products.filter((item) =>
     item.item_name.toLowerCase().includes(search.toLowerCase())
+  
   );
+
+  const addToCart = (item) => {
+    const productToAdd={
+      product_id: item.product_id,
+      item_name: item.item_name,
+      price: parseFloat(item.price),
+      available_quantity: item.quantity, // Available quantity from the product
+      quantity: 1,
+    };
+    setCartItems((prevCart) => {
+      const existingItem = prevCart.find(cartItem => cartItem.product_id === productToAdd.product_id);
+      if (existingItem) {
+        // If the item already exists in the cart, do not add it again
+        return prevCart;
+      }
+      return [...prevCart, productToAdd]; // Add the new item to the cart
+    });
+  };
+
 
   return (
     <ScrollView style={styles.container}>
@@ -57,7 +77,9 @@ const Buymain = ({ search, city, setCity,url }) => {
           </View>
 
           {/* Add Icon */}
+          <TouchableOpacity onPress={() => addToCart(item)}>
           <Ionicons name="add-circle" size={36} color="#4F7726" />
+          </TouchableOpacity>
         </View>
       ))}
 

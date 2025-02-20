@@ -3,18 +3,24 @@ import { View, Text, StyleSheet, TextInput, Pressable } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useState } from "react";
 import Feather from "@expo/vector-icons/Feather";
-const Buytopbar = ({ search, setSearch, locpage, setLocpage,city,setCity,url }) => {
+const Buytopbar = ({ search, setSearch, locpage, setLocpage,city,setCity,url,setNavigation }) => {
   
 
   const handleLoc=()=>{
     setLocpage(2);
+  }
+
+  const handleCart=()=>{
+    setNavigation(6);
   }
   return (
     <View style={styles.container}>
       {/* Top Section */}
       <View style={styles.header}>
         <Text style={styles.texthello}>Hello there</Text>
+        <Pressable onPress={handleCart}>
         <Feather name="shopping-cart" size={24} color="black" />
+        </Pressable>
       </View>
 
       {/* Search Bar */}
