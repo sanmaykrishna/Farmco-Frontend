@@ -13,7 +13,7 @@ import axios from "axios";
 import Feather from "@expo/vector-icons/Feather";
 
 const Postcollab = ({ userId, setUserId, url }) => {
-  console.log("User  ID in Postcollab:", userId);
+  
   const [items, setItems] = useState([]);
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(null);
@@ -60,50 +60,56 @@ const Postcollab = ({ userId, setUserId, url }) => {
 
   const handleAddData = async () => {
     if (!userId) {
-      Alert.alert("Error", "User  ID is required.");
+      Alert.alert("Error", "User ID is required.");
       return;
     }
-
-    // Validate price input
-  const parsedPrice = parseFloat(price);
-  if (isNaN(parsedPrice)) {
-    Alert.alert("Error", "Price must be a valid number.");
-    return;
-  }
-
+  
+    const parsedPrice = parseFloat(price);
+    if (isNaN(parsedPrice)) {
+      Alert.alert("Error", "Price must be a valid number.");
+      return;
+    }
+  
     const postCollabData = {
       item_name: value,
       location_name: locvalue,
-      quantity: parseInt(quantity, 10), // Ensure quantity is an integer
-      price: parsedPrice, // Ensure price is a float
+      quantity: parseInt(quantity, 10),
+      price: parsedPrice,
       address: address,
-      pincode: parseInt(pincode, 10), // Ensure pincode is an integer
+      pincode: parseInt(pincode, 10),
       user_id: userId,
     };
-
+  
     console.log("Posting collaboration data:", postCollabData);
-
+  
     const config = {
       headers: { "Content-Type": "application/json" },
     };
-
+  
     try {
-      const response = await axios.post(
-        `http://${url}:3000/collab`, // Adjust the endpoint as necessary
-        postCollabData,
-        config
-      );
-      Alert.alert("Success", "Collaboration Posted");
+      const response = await axios.post(`http://${url}:3000/collab`, postCollabData, config);
+      console.log("Response from backend:", response.data);
+      
+      const newCollabId = response.data.collab_id;
+      if (!newCollabId) throw new Error("collab_id not returned from API");
+  
+      Alert.alert("Success", `Collaboration Posted! Collab ID: ${newCollabId}`);
+  
+      // 🔹 Convert values before sending the second request
+      const quantityCollabData = {
+        collabid: Number(newCollabId),
+        empid: Number(userId),
+        qty: Number(quantity),
+      };
+  
+      const qtyResponse = await axios.post(`http://${url}:3000/quantity`, quantityCollabData, config);
+      console.log("Quantity posted successfully:", qtyResponse.data);
+      
     } catch (error) {
-      console.error(
-        "Error posting collaboration:",
-        error.message,
-        error.config
-      );
-      Alert.alert("Error", "Network Error: Unable to post collaboration.");
+      console.error("Error posting quantity:", error.response?.data || error.message);
+      Alert.alert("Error", `Failed to post quantity: ${error.response?.data?.message || "Unknown error"}`);
     }
   };
-
   return (
     <View style={styles.pview}>
       {/* Dropdown for selecting an item */}

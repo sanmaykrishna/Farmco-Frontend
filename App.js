@@ -1,21 +1,32 @@
 import { View, Text, StyleSheet, Platform, StatusBar } from "react-native";
 import Buypage from "./Buypage";
 import Navbar from "./component/Navbar";
-import { useState } from "react";
+import { use, useState } from "react";
 import Sellpage from "./Sellpage";
 import axios from "axios";
 import Cropyield from "./Cropyield";
 import Login from "./authorize/Login";
 import Register from "./authorize/Register";
 import Cart from "./carts/Cart";
-const App = () => {
-  const [navigation, setNavigation] = useState(1);
-  const [city, setCity] = useState("None");
-  const [data, setData] = useState({});
-  const [userId, setUserId] = useState(null);
-  const [cartItems, setCartItems] = useState([]);
+import AccountSettings from "./settings/AccountSettings";
 
-  const url = "192.168.1.20";
+//settings->14
+//Register->1
+//Login->2
+
+const App = () => {
+  const [navigation, setNavigation] = useState(3);
+  const [city, setCity] = useState("None");
+  const [collabcity, setCollabcity] = useState("None");
+  const [data, setData] = useState({});
+  const [userId, setUserId] = useState(1);
+  const [uname, setUname] = useState(null);
+  const [cartItems, setCartItems] = useState([]);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [navbar, setNavbar] = useState("main");
+
+  const url = "192.168.1.23";
   const containerStyle =
     navigation === 1 || navigation === 2
       ? styles.container1
@@ -24,6 +35,7 @@ const App = () => {
     <View style={containerStyle}>
       {navigation === 1 ? (
         <Register
+          setNavbar={setNavbar}
           navigation={navigation}
           setNavigation={setNavigation}
           data={data}
@@ -32,6 +44,7 @@ const App = () => {
         />
       ) : navigation === 2 ? (
         <Login
+          setNavbar={setNavbar}
           navigation={navigation}
           setNavigation={setNavigation}
           data={data}
@@ -39,6 +52,11 @@ const App = () => {
           userId={userId}
           setUserId={setUserId}
           url={url}
+          setUname={setUname}
+          setPassword={setPassword}
+          setEmail={setEmail}
+          email={email}
+          password={password}
         />
       ) : navigation === 3 ? (
         <Buypage
@@ -49,13 +67,38 @@ const App = () => {
           setCartItems={setCartItems}
         />
       ) : navigation == 4 ? (
-        <Sellpage userId={userId} setUserId={setUserId} url={url} navigation={navigation} setNavigation={setNavigation} />
+        <Sellpage
+          userId={userId}
+          setUserId={setUserId}
+          url={url}
+          navigation={navigation}
+          setNavigation={setNavigation}
+          collabcity={collabcity}
+          setCollabcity={setCollabcity}
+        />
       ) : navigation == 5 ? (
         <Cropyield url={url} />
       ) : navigation == 6 ? (
-        <Cart cartItems={cartItems} setCartItems={setCartItems} />
+        <Cart url={url} cartItems={cartItems} setCartItems={setCartItems} />
+      ) : navigation == 14 ? (
+        <AccountSettings
+          userId={userId}
+          setUname={setUname}
+          setPassword={setPassword}
+          setEmail={setEmail}
+          email={email}
+          password={password}
+          uname={uname}
+          url={url}
+        />
       ) : null}
-      <Navbar navigation={navigation} setNavigation={setNavigation} url={url} />
+      {navbar == "main" ? (
+        <Navbar
+          navigation={navigation}
+          setNavigation={setNavigation}
+          url={url}
+        />
+      ) : null}
     </View>
   );
 };

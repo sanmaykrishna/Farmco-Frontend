@@ -5,9 +5,9 @@ import Sellitem from "./Sellitem";
 import Postcollab from "./Postcollab";
 import Viewcollab from "./Viewcollab";
 
-const Sellmain = ({userId,setUserId,url,navigation,setNavigation}) => {
+const Sellmain = ({userId,setUserId,url,navigation,setNavigation,setTopbar,showSellItem,setShowSellItem,search,setSeachCollab,city}) => {
   const [selected, setSelected] = useState(null);
-  const [showSellItem, setShowSellItem] = useState(0);
+ 
  
   const options = [
     { id: 1, label: "Sell An Item", icon: "shopping-bag"},
@@ -18,10 +18,13 @@ const Sellmain = ({userId,setUserId,url,navigation,setNavigation}) => {
   const handleOptionPress = (optionId) => {
     setSelected(optionId);
     if (optionId === 1) {
+      setTopbar("main");
       setShowSellItem(1); // Show Sellitem page for "Sell An Item"
     } else if (optionId === 2) {
+      setTopbar("main");
       setShowSellItem(2); // Navigate to Postcollab
     } else if (optionId === 3) {
+      setTopbar("view");
       setShowSellItem(3); // Navigate to Viewcollab
     }
   };
@@ -31,7 +34,7 @@ const Sellmain = ({userId,setUserId,url,navigation,setNavigation}) => {
     <View style={styles.container}>
       {showSellItem === 1 ? (
         <Sellitem userId={userId} setUserId={setUserId} url={url} />
-      ) : showSellItem ===2 ? <Postcollab userId={userId} setUserId={setUserId} url={url}/> : showSellItem === 3 ? <Viewcollab/> : (
+      ) : showSellItem ===2 ? <Postcollab userId={userId} setUserId={setUserId} url={url}/> : showSellItem === 3 ? <Viewcollab userId={userId} city={city} search={search} setSearch={setSeachCollab} url={url} setTopbar={setTopbar} /> : (
         options.map((option) => (
           <Pressable
             key={option.id}

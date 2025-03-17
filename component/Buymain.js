@@ -1,10 +1,9 @@
-
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import axios from "axios";
+import ProductCard from "../Cards/ProductCard";
 
-// Mapping of item names to image imports
 const imageMap = {
   tomato: require("../assets/tomato.png"),
   carrot: require("../assets/carrot.png"),
@@ -15,18 +14,20 @@ const imageMap = {
   wheat: require("../assets/wheat.png"),
   banana: require("../assets/banana.png"),
   ginger: require("../assets/ginger.png"),
-  
-  // Add more mappings as needed
 };
 
-const Buymain = ({ search, city, setCity,url,setCartItems }) => {
+const Buymain = ({ search, city, url, setCartItems,setTopbar }) => {
   const [products, setProducts] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null); // New state for selected product
+
 
   useEffect(() => {
     const getItem = async () => {
       try {
-        const { data } = await axios.get(`http://${url}:3000/product/location?location_name=${encodeURIComponent(city)}`);
-        setProducts(data); // Assuming the API returns an array of products
+        const { data } = await axios.get(
+          `http://${url}:3000/product/location?location_name=${encodeURIComponent(city)}`
+        );
+        setProducts(data || []);
       } catch (error) {
         console.error("Error fetching products:", error);
       }
@@ -37,56 +38,55 @@ const Buymain = ({ search, city, setCity,url,setCartItems }) => {
     }
   }, [city]);
 
-  // Filter products based on search query (case-insensitive)
   const filteredProducts = products.filter((item) =>
     item.item_name.toLowerCase().includes(search.toLowerCase())
-  
   );
 
   const addToCart = (item) => {
-    const productToAdd={
+    const productToAdd = {
       product_id: item.product_id,
       item_name: item.item_name,
       price: parseFloat(item.price),
-      available_quantity: item.quantity, // Available quantity from the product
+      available_quantity: item.quantity,
       quantity: 1,
     };
     setCartItems((prevCart) => {
-      const existingItem = prevCart.find(cartItem => cartItem.product_id === productToAdd.product_id);
-      if (existingItem) {
-        // If the item already exists in the cart, do not add it again
-        return prevCart;
-      }
-      return [...prevCart, productToAdd]; // Add the new item to the cart
+      const existingItem = prevCart.find((cartItem) => cartItem.product_id === productToAdd.product_id);
+      return existingItem ? prevCart : [...prevCart, productToAdd];
     });
   };
+
+
+
+
+  // If a product is selected, show ProductCard
+  if (selectedProduct) {
+    return <ProductCard setCartItems={setCartItems} setTopbar={setTopbar} productsolo={selectedProduct} url={url} goBack={() => setSelectedProduct(null)} />;
+  }
+
+
 
 
   return (
     <ScrollView style={styles.container}>
       {filteredProducts.map((item) => (
-        <View key={item.product_id} style={styles.card}>
-          {/* Larger Image */}
+        <TouchableOpacity
+          key={item.product_id}
+          style={styles.card}
+          onPress={() => setSelectedProduct(item)} // Navigate to ProductCard
+        >
           <Image source={imageMap[item.item_name.toLowerCase()]} style={styles.image} />
-
-          {/* Text Content */}
           <View style={styles.info}>
             <Text style={styles.name}>{item.item_name}</Text>
-            <Text style={styles.price}>{item.price}</Text>
+            <Text style={styles.price}>₹{item.price}</Text>
             <Text style={styles.location}>{item.location_name}</Text>
           </View>
-
-          {/* Add Icon */}
           <TouchableOpacity onPress={() => addToCart(item)}>
-          <Ionicons name="add-circle" size={36} color="#4F7726" />
+            <Ionicons name="add-circle" size={36} color="#4F7726" />
           </TouchableOpacity>
-        </View>
+        </TouchableOpacity>
       ))}
-
-      {/* No results message */}
-      {filteredProducts.length === 0 && (
-        <Text style={styles.noResults}>No products found</Text>
-      )}
+      {filteredProducts.length === 0 && <Text style={styles.noResults}>No products found</Text>}
     </ScrollView>
   );
 };
@@ -94,11 +94,7 @@ const Buymain = ({ search, city, setCity,url,setCartItems }) => {
 export default Buymain;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: 20,
-    marginTop: 18,
-  },
+  container: { flex: 1, paddingHorizontal: 20, marginTop: 18 },
   card: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -112,43 +108,12 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
     elevation: 2,
-    height: 120, // Fixed height for each card
+    height: 120,
   },
-  image: {
-    width: 80, // Increased image size
-    height: 80,
-    resizeMode: "contain",
-  },
-  info: {
-    flex: 1,
-    marginHorizontal: 15,
-    justifyContent: "space-evenly",
-  },
-  name: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#333",
-  },
-  price: {
-    fontSize: 16,
-    color: "#4F7726",
-    fontWeight: "500",
-  },
-  location: {
-    fontSize: 14,
-    color: "#6C757D",
-  },
-  noResults: {
-    textAlign: "center",
-    marginTop: 20,
-    fontSize: 16,
-    color: "#6C757D",
-  },
+  image: { width: 80, height: 80, resizeMode: "contain" },
+  info: { flex: 1, marginHorizontal: 15, justifyContent: "space-evenly" },
+  name: { fontSize: 18, fontWeight: "bold", color: "#333" },
+  price: { fontSize: 16, color: "#4F7726", fontWeight: "500" },
+  location: { fontSize: 14, color: "#6C757D" },
+  noResults: { textAlign: "center", marginTop: 20, fontSize: 16, color: "#6C757D" },
 });
-
-
-
-
-
-
-

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import Feather from "@expo/vector-icons/Feather";
-const Searchlocation = ({ locpage, setLocpage, city, setCity,url }) => {
+const CollabLoc = ({ setCollabcity,setCollabLocation,url ,city}) => {
   const [locopen, setLocopen] = useState(true);
   const [locvalue, setLocvalue] = useState(null);
   const [locitems, setLocitems] = useState([]);
@@ -27,11 +27,11 @@ const Searchlocation = ({ locpage, setLocpage, city, setCity,url }) => {
   }, []);
 
   const handleSearch = () => {
-    setCity(locvalue);
+    setCollabcity(locvalue);
     
   };
   const handlePress=()=>{
-    setLocpage(1);
+    setCollabLocation(1);
   }
 
   return (
@@ -69,7 +69,7 @@ const Searchlocation = ({ locpage, setLocpage, city, setCity,url }) => {
     </View>
   );
 };
-export default Searchlocation;
+export default CollabLoc;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -94,5 +94,4 @@ const styles = StyleSheet.create({
   },
   field: { flexDirection: "row" },
   placeholderText: { fontWeight: "condensed", fontSize: 14, color: "gray" },
-
 });

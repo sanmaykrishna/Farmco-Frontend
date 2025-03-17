@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,12 +8,17 @@ import {
   Alert,
 } from "react-native";
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage"; // Import AsyncStorage
 
-export default function Register({ setNavigation, data, setData,url }) {
+export default function Register({ setNavbar,setNavigation, data, setData, url }) {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  useEffect(()=>{
+    setNavbar("local");
+  },[]);
 
   const handleRegister = async () => {
     // Validation checks
@@ -37,10 +42,7 @@ export default function Register({ setNavigation, data, setData,url }) {
       return;
     }
 
-    // Generate the next ID
-    const nextId = Object.keys(data).length + 1;
-
-    // Save user data to the object
+    // Create user data
     const newUser = {
       user_name: username,
       email: email,
@@ -52,26 +54,27 @@ export default function Register({ setNavigation, data, setData,url }) {
     };
 
     try {
-      await axios.post(
+      const response = await axios.post(
         `http://${url}:3000/users/newuser`,
         newUser,
         config
       );
-      Alert.alert("Success", "Registration Successful!");
-      setNavigation(2); // Navigate to Login page
+
+      if (response.data.token) {
+        await AsyncStorage.setItem("authToken", response.data.token); // Store JWT token
+        setData([...data, newUser]); // Update local state with new user
+        Alert.alert("Success", "Registration Successful!");
+        setNavigation(3); // Navigate to Dashboard or Home
+      } else {
+        Alert.alert("Success", "Registration successful! Please login.");
+        setNavigation(2); // Navigate to Login page
+      }
     } catch (error) {
       if (error.response?.status === 409) {
-        Alert.alert(
-          
-          "Error",
-          "Email already exists. Please use a different email."
-        );
+        Alert.alert("Error", "Email already exists. Please use a different email.");
       } else {
         console.error("Error posting data:", error);
-        Alert.alert(
-          "Error",
-          "Failed to register user. Please try again later."
-        );
+        Alert.alert("Error", "Failed to register user. Please try again later.");
       }
     }
   };
@@ -162,3 +165,5 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
+
+

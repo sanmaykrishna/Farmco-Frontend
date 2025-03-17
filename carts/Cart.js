@@ -6,32 +6,66 @@ import {
   Image,
   StyleSheet,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
+import axios from "axios";
 
-const Cart = ({ cartItems, setCartItems }) => {
+const Cart = ({ cartItems, setCartItems, url }) => {
+  console.log("Cart Items:", cartItems); // Debugging
+
   const updateQuantity = (id, increment) => {
     const item = cartItems.find((item) => item.product_id === id);
     if (!item) return;
 
     const newQuantity = item.quantity + increment;
 
-    // Check if the new quantity exceeds available quantity
     if (newQuantity > item.available_quantity) {
-      alert(
-        `Cannot add more than ${item.available_quantity} of ${item.item_name}`
-      );
+      alert(`Cannot add more than ${item.available_quantity} of ${item.item_name}`);
       return;
     }
 
-    const updatedItems = cartItems.map((cartItem) =>
-      cartItem.product_id === id
-        ? { ...cartItem, quantity: newQuantity }
-        : cartItem
-    );
-
-    setCartItems(updatedItems);
+    if (newQuantity < 1) {
+      setCartItems(cartItems.filter((cartItem) => cartItem.product_id !== id));
+    } else {
+      const updatedItems = cartItems.map((cartItem) =>
+        cartItem.product_id === id ? { ...cartItem, quantity: newQuantity } : cartItem
+      );
+      setCartItems(updatedItems);
+    }
   };
+
+  const placeOrder = async () => {
+    if (!cartItems.length) return;
+
+    const orderData = cartItems.map((item) => ({
+      product_id: item.product_id,  // Change "productId" to "product_id"
+      quantity: item.quantity,
+    }));
+    
+    try {
+      const response = await axios.post(`http://${url}:3000/product/update-quantities`, orderData);
+      console.log("Order response:", orderData);
+
+      // Clear the cart
+      setCartItems([]);
+
+      // Show success message
+      Alert.alert("Order Placed", "Your order will be received in 1 day!", [{ text: "OK" }]);
+    } catch (error) {
+      console.error("Error placing order:", error);
+      Alert.alert("Error", "Failed to place order. Please try again.");
+    }
+  };
+
+  if (!cartItems || cartItems.length === 0) {
+    return (
+      <View style={styles.emptyCartContainer}>
+        <MaterialIcons name="shopping-cart" size={64} color="#ccc" />
+        <Text style={styles.emptyCartText}>Your cart is empty</Text>
+      </View>
+    );
+  }
 
   const renderItem = ({ item }) => (
     <View style={styles.cartItem}>
@@ -60,21 +94,14 @@ const Cart = ({ cartItems, setCartItems }) => {
     </View>
   );
 
-  if (cartItems.length === 0) {
-    return (
-      <View style={styles.emptyCartContainer}>
-        <MaterialIcons name="shopping-cart" size={64} color="#ccc" />
-        <Text style={styles.emptyCartText}>Your cart is empty</Text>
-      </View>
-    );
-  }
-
   return (
     <View style={styles.container}>
       <FlatList
         data={cartItems}
         renderItem={renderItem}
-        keyExtractor={(item) => item.product_id.toString()}
+        keyExtractor={(item, index) =>
+          item?.product_id ? item.product_id.toString() : index.toString()
+        }
       />
       <View style={styles.footer}>
         <Text style={styles.total}>
@@ -83,10 +110,7 @@ const Cart = ({ cartItems, setCartItems }) => {
             .reduce((sum, item) => sum + item.price * (item.quantity || 1), 0)
             .toFixed(2)}
         </Text>
-        <TouchableOpacity
-          style={styles.placeOrderButton}
-          onPress={() => console.log("Place Order")}
-        >
+        <TouchableOpacity style={styles.placeOrderButton} onPress={placeOrder}>
           <Text style={styles.placeOrderText}>Place Order</Text>
         </TouchableOpacity>
       </View>

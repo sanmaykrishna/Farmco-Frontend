@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, StyleSheet, Pressable, Alert } from "react-native";
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default function Login({ navigation, setNavigation, data,userId,setUserId,url }) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  
+export default function Login({ setNavbar,navigation, setNavigation, setUserId, setUname, url, setPassword, setEmail, email, password }) {
+ 
   
 
   const handleLogin = async () => {
@@ -13,39 +12,60 @@ export default function Login({ navigation, setNavigation, data,userId,setUserId
       Alert.alert("Error", "All fields are required");
       return;
     }
+ 
+    const loginUser = { email, password };
+    console.log("Attempting login with:", loginUser); // Debugging
 
-    const loginUser = {
-      email: email,
-      password: password,
-    };
-
-    const config = {
-      headers: { "Content-Type": "application/json" },
-    };
-
+    
+ 
     try {
-      const response = await axios.post(`http://${url}:3000/users/login`, loginUser, config);
+      // Make sure Content-Type is set properly
+      const config = {
+        headers: { "Content-Type": "application/json" },
+      };
+
+      const response = await axios.post(
+        `http://${url}:3000/users/login`, 
+        loginUser,
+        config
+      );
       
-      Alert.alert("Success", "Login Successful");
-      
-      setUserId(response.data.user.user_id); // Store the user_id in the state
-      console.log("Logged in user_id:", response.data.user.user_id);
-      
-      setNavigation(3); // Navigate to the next screen
+      console.log("Login response:", response.data); // Debugging
+ 
+      if (response.data.token) {
+        const { token, user } = response.data;
+       
+        setUserId(user.user_id);
+        setUname(user.user_name);
+        setEmail(user.email);
+        setPassword(password);
+ 
+        // Store token securely - use same key as in registration
+        await AsyncStorage.setItem("authToken", token);
+       
+        Alert.alert("Success", "Login Successful");
+        setNavbar("main");
+        setNavigation(3); // Navigate to the dashboard
+      } else {
+        Alert.alert("Error", "Invalid login response");
+      }
     } catch (error) {
+      console.log("Login error details:", error);
+      console.log("Login error response:", error.response ? {
+        status: error.response.status,
+        data: error.response.data
+      } : "No response");
+     
       if (error.response?.status === 401) {
         Alert.alert("Error", "Invalid email or password");
       } else if (error.response?.status === 404) {
         Alert.alert("Error", "User not found");
       } else {
-        Alert.alert("Error", "An error occurred during login");
-        console.error("Login error:", error);
+        Alert.alert("Error", "An error occurred during login. Please check the console for details.");
       }
     }
   };
-
-
-
+ 
   return (
     <View style={{ flex: 1, width: "100%" }}>
       <Text style={styles.header}>Welcome back! Glad to see you, Again!</Text>
@@ -55,6 +75,8 @@ export default function Login({ navigation, setNavigation, data,userId,setUserId
           placeholder="Enter your email"
           value={email}
           onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
         />
         <TextInput
           style={styles.Inputbox}
@@ -62,14 +84,15 @@ export default function Login({ navigation, setNavigation, data,userId,setUserId
           secureTextEntry
           value={password}
           onChangeText={setPassword}
+          autoCapitalize="none"
         />
         <Pressable onPress={handleLogin}>
           <Text style={[styles.Buttonlike, styles.Inputbox]}>Login</Text>
         </Pressable>
       </View>
       <View style={styles.Lastview}>
-        <Text style={styles.Lasttext}>Don’t have an account?</Text>
-        <Pressable onPress={() => setNavigation(1)}>
+        <Text style={styles.Lasttext}>Don't have an account?</Text>
+        <Pressable onPress={() => {setNavigation(1)}}>
           <Text style={styles.Register}>Register Now</Text>
         </Pressable>
       </View>
@@ -78,40 +101,10 @@ export default function Login({ navigation, setNavigation, data,userId,setUserId
 }
 
 const styles = StyleSheet.create({
-  header: {
-    fontSize: 30,
-    paddingLeft: 40,
-    marginTop: 50,
-    fontWeight: "bold",
-  },
-  Inputbox: {
-    width: 300,
-    height: 50,
-    borderColor: "gray",
-    borderStyle: "solid",
-    borderWidth: 1.5,
-    borderRadius: 7,
-  },
-  Buttonlike: {
-    backgroundColor: "black",
-    color: "white",
-    fontWeight: "bold",
-    fontSize: 17,
-    textAlign: "center",
-    padding: 10,
-  },
-  Lastview: {
-    marginTop: 35,
-    alignItems: "center",
-  },
-  Lasttext: {
-    textAlign: "center",
-    fontSize: 17,
-  },
-  Register: {
-    textAlign: "center",
-    fontSize: 17,
-    color: "#2CA4BC",
-    fontWeight: "bold",
-  },
+  header: { fontSize: 30, paddingLeft: 40, marginTop: 50, fontWeight: "bold" },
+  Inputbox: { width: 300, height: 50, borderColor: "gray", borderWidth: 1.5, borderRadius: 7, paddingHorizontal: 10 },
+  Buttonlike: { backgroundColor: "black", color: "white", fontWeight: "bold", fontSize: 17, textAlign: "center", padding: 10 },
+  Lastview: { marginTop: 35, alignItems: "center" },
+  Lasttext: { fontSize: 17 },
+  Register: { fontSize: 17, color: "#2CA4BC", fontWeight: "bold" },
 });
